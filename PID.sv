@@ -5,7 +5,7 @@ input vld;
 input rst_n;
 input pwr_up;
 input rider_off;
-parameter FAST_SIM = 1;
+parameter fast_sim = 1;
 input  [15:0] ptch;
 input  [15:0] ptch_rt;
 output [7:0] ss_tmr;
