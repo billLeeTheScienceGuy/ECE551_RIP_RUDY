@@ -79,9 +79,9 @@ assign PID_cntrl = (PID_sum[15]) ? ((&PID_sum[14:11]) ? PID_sum[11:0] : 	//satur
 /////////////// Soft Start Timer ////////////
 always_ff @(posedge clk or negedge rst_n) 
 	if(!rst_n)
-		ss_tmr_27b <= 27'h00000000;
+		ss_tmr_27b <= 27'h0;
 	else if(~pwr_up)
-		ss_tmr_27b <= 27'h00000000;
+		ss_tmr_27b <= 27'h0;
 	else if(&ss_tmr_27b[26:8] == 1'b0)
 		ss_tmr_27b <= ss_tmr_27b + ss_tmr_inc;
 		
