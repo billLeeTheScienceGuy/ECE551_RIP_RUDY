@@ -76,7 +76,7 @@ always_comb begin
                 nxt_state = G6;
             end
                 else if(timer_duration == 0)
-					 reset_timer;
+					reset_timer = 1;
                 nxt_state = IDLE;
             end
        
