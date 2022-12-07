@@ -1,12 +1,12 @@
 module mtr_drv(clk,rst_n,lft_spd,rght_spd,OVR_I_lft,OVR_I_rght,PWM1_lft,
-               PWM2_lft,PWM1_rght,PWM2_rght,LED);
+               PWM2_lft,PWM1_rght,PWM2_rght);
 			   
   input clk,rst_n;
   input [11:0] lft_spd, rght_spd;	// 12-bit signed (negative is reverse)
   input OVR_I_lft, OVR_I_rght;
   
   output PWM1_lft, PWM2_lft, PWM1_rght, PWM2_rght;
-  output [7:0] LED;
+  logic [7:0] LED;
   
   ////////////////////////////////////////////
   // synchronize duty changes to PWM cycle //

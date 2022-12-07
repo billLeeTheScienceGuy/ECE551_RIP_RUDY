@@ -99,7 +99,7 @@ module UART_rx(clk, rst_n, RX, clr_rdy , rx_data, rdy);
 		
 	end
 	
-	assign shift = (baud_cnt[11:0] === 12'd00000000000) ? 1'b1 : 1'b0;
+	assign shift = (baud_cnt[11:0] === 12'd0) ? 1'b1 : 1'b0;
 	
 	/*
 	bit_cnt

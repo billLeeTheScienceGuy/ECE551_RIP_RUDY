@@ -96,9 +96,9 @@ module SegwayModel(clk,RST_n,SS_n,SCLK,MISO,MOSI,INT,PWM1_lft,PWM2_lft,
   //// Infer main SPI shift register ////
   always_ff @(negedge SCLK, negedge POR_n)
     if (!POR_n)
-	  shft_reg_tx <= 16'h0000;
+	  shft_reg_tx <= 16'h0;
 	else if (init)
-	  shft_reg_tx <= 16'h0000;
+	  shft_reg_tx <= 16'h0;
 	else if (ld_tx_reg)						// occurs at beginning and middle of 16-bit transaction
 	  shft_reg_tx <= {tx_data,8'h00};
 	else if (shft_tx)
@@ -107,13 +107,13 @@ module SegwayModel(clk,RST_n,SS_n,SCLK,MISO,MOSI,INT,PWM1_lft,PWM2_lft,
   //// Infer main SPI shift register ////
   always_ff @(posedge SCLK, negedge POR_n)
     if (!POR_n)
-	  shft_reg_rx <= 16'h0000;
+	  shft_reg_rx <= 16'h0;
 	else if (!SS_n)
 	  shft_reg_rx <= {shft_reg_rx[14:0],MOSI};
 	  
   always_ff @(negedge SCLK)
     if (init)
-	  bit_cnt <= 4'b0000;
+	  bit_cnt <= 4'b0;
 	else if (shft_tx)
 	  bit_cnt <= bit_cnt + 1;
 	  
@@ -138,7 +138,7 @@ module SegwayModel(clk,RST_n,SS_n,SCLK,MISO,MOSI,INT,PWM1_lft,PWM2_lft,
   ////////////////////////////////////////////////
   always_ff @(posedge internal_clk, negedge POR_n)
     if (!POR_n)
-	  update_period <= 11'h0000;
+	  update_period <= 11'h0;
 	else if (NEMO_setup)
 	  update_period <= update_period + 1;
 	
@@ -168,7 +168,7 @@ module SegwayModel(clk,RST_n,SS_n,SCLK,MISO,MOSI,INT,PWM1_lft,PWM2_lft,
 	  ld_tx_reg = 0;
       shft_tx = 0;
       init = 0;
-	  tx_data = 16'h0000;
+	  tx_data = 16'h0;
 	  set_write = 0;
       nstate = IDLE;	  
 
@@ -227,8 +227,8 @@ module SegwayModel(clk,RST_n,SS_n,SCLK,MISO,MOSI,INT,PWM1_lft,PWM2_lft,
 	
   always_ff @(posedge clk, negedge rst_n)
     if (!rst_n) begin
-	  lft_frwrd_cnt <= 11'h000;
-	  lft_rev_cnt <= 11'h000;
+	  lft_frwrd_cnt <= 11'h0;
+	  lft_rev_cnt <= 11'h0;
 	end else if (lft_rise) begin
 	  lft_frwrd_cnt <= 11'h001;
 	  lft_rev_cnt <= 11'h001;
@@ -239,8 +239,8 @@ module SegwayModel(clk,RST_n,SS_n,SCLK,MISO,MOSI,INT,PWM1_lft,PWM2_lft,
 	
   always_ff @(posedge clk, negedge rst_n)
     if (!rst_n) begin
-	  rght_frwrd_cnt <= 11'h000;
-	  rght_rev_cnt <= 11'h000;
+	  rght_frwrd_cnt <= 11'h0;
+	  rght_rev_cnt <= 11'h0;
 	end else if (rght_rise) begin
 	  rght_frwrd_cnt <= 11'h001;
 	  rght_rev_cnt <= 11'h001;
@@ -251,25 +251,25 @@ module SegwayModel(clk,RST_n,SS_n,SCLK,MISO,MOSI,INT,PWM1_lft,PWM2_lft,
 	
   always_ff @(posedge clk, negedge rst_n)
     if (!rst_n)
-	  time_since_rise_lft <= 12'h0000;
+	  time_since_rise_lft <= 12'h0;
 	else if (lft_rise)
-	  time_since_rise_lft <= 12'h0000;
+	  time_since_rise_lft <= 12'h0;
 	else
 	  time_since_rise_lft <= time_since_rise_lft + 1;
 	  
   always_ff @(posedge clk, negedge rst_n)
     if (!rst_n)
-	  time_since_rise_rght <= 12'h000;
+	  time_since_rise_rght <= 12'h0;
 	else if (rght_rise)
-	  time_since_rise_rght <= 12'h000;
+	  time_since_rise_rght <= 12'h0;
 	else
 	  time_since_rise_rght <= time_since_rise_lft + 1;	
 
   always_ff @(posedge clk, negedge rst_n)
     if (!rst_n)
-	  time_since_calc <= 12'h000;
+	  time_since_calc <= 12'h0;
 	else if (calc_physics || time_since_calc[11])
-	  time_since_calc <= 12'h000;
+	  time_since_calc <= 12'h0;
 	else
 	  time_since_calc <= time_since_calc + 1;	  
 	  
@@ -279,19 +279,19 @@ module SegwayModel(clk,RST_n,SS_n,SCLK,MISO,MOSI,INT,PWM1_lft,PWM2_lft,
   
   always_ff @(posedge clk, negedge rst_n)
     if (!rst_n)
-	  lft_duty <= 12'h000;
+	  lft_duty <= 12'h0;
 	else if (time_since_rise_lft[11])
 	  lft_duty <= 1'b0;
 	else if (lft_fall)
-	  lft_duty <= ((|lft_frwrd_cnt)===1'bx) ? 12'h000 : {1'b0,lft_frwrd_cnt} -  {1'b0,lft_rev_cnt};
+	  lft_duty <= ((|lft_frwrd_cnt)===1'bx) ? 12'h0 : {1'b0,lft_frwrd_cnt} -  {1'b0,lft_rev_cnt};
 
   always_ff @(posedge clk, negedge rst_n)
     if (!rst_n)
-	  rght_duty <= 12'h000;
+	  rght_duty <= 12'h0;
 	else if (time_since_rise_rght[11])
 	  rght_duty <= 1'b0;
 	else if (rght_fall)
-	  rght_duty <= ((|lft_frwrd_cnt)===1'bx) ? 12'h000 : {1'b0,rght_frwrd_cnt} - {1'b0,rght_rev_cnt};	 
+	  rght_duty <= ((|lft_frwrd_cnt)===1'bx) ? 12'h0 : {1'b0,rght_frwrd_cnt} - {1'b0,rght_rev_cnt};	 
 
   always_ff @(posedge clk, negedge rst_n)
     if (!rst_n)

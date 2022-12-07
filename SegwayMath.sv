@@ -1,96 +1,100 @@
-module SegwayMath(PID_cntrl, ss_tmr, steer_pot, en_steer, pwr_up, lft_spd, rght_spd, too_fast);
+module SegwayMath(PID_cntrl,ss_tmr,steer_pot,en_steer,pwr_up,lft_spd,rght_spd,too_fast);
 
-input signed [11:0] PID_cntrl;
-input [7:0] ss_tmr;
-input [11:00] steer_pot;
+input signed [11:0]PID_cntrl;
+input [7:0]ss_tmr;
+input [11:0]steer_pot;
 input en_steer;
 input pwr_up;
-output [11:0] rght_spd;
-output [11:0] lft_spd;
-output too_fast;
+output [11:0]lft_spd;
+output [11:0]rght_spd;
+output too_fast; 
 
-///////////////// Local parameters ///////////////////////
+logic [11:0]steer_pot_sat;
+logic signed [11:0]PID_ss;
+logic signed [19:0]PID_ss_temp;
+logic [11:0]steer_pot;
+logic signed [11:0]steer_pot_signed;
+logic signed [11:0]steer_pot_final;
+logic signed [12:0]lft_torque_in;
+logic signed [12:0]rght_torque_in;
+logic signed [12:0]lft_torque;
+logic signed [12:0]rght_torque;
+logic unsigned [12:0]abs_lft_torque;
+logic unsigned [12:0]abs_rght_torque;
+
+/***
+Steering input,
+we are zero extending ss_tmr to keep it positive.
+PID_cntrl is then multiplied by this value to form 12-bit PID_ss
+*/
+assign PID_ss_temp = PID_cntrl * $signed({1'b0,ss_tmr[7:0]});
+assign PID_ss = PID_ss_temp[19:8];
+
+// Saturating steer_pot to make sure it is within a max of 0xE00 and a minimum of 0x200
+assign steer_pot_sat = (steer_pot < 12'h200) ? 12'h200 : (steer_pot > 12'hE00) ? 12'hE00 : steer_pot;
+// Making steer_pot signed
+assign steer_pot_signed = $signed(steer_pot_sat - 12'h7ff);
+// Multiplies steer_pot by 3/16
+assign steer_pot_final = {{4{steer_pot_signed[11]}}, steer_pot_signed[11:4]} + {{3{steer_pot_signed[11]}}, steer_pot_signed[11:3]};
+
+// Temp variables to help with later conditional logic
+assign lft_torque_in = {{1{steer_pot_final[11]}},steer_pot_final} + {PID_ss[11], PID_ss};
+assign rght_torque_in = {PID_ss[11], PID_ss} - {{1{steer_pot_final[11]}}, steer_pot_final};
+
+// Assigns lft_torque/right torque if steering is enabled.
+assign lft_torque = en_steer ? lft_torque_in : {PID_ss[11],PID_ss};
+assign rght_torque = en_steer ? rght_torque_in: {PID_ss[11],PID_ss};
+
+/***
+Deadzone Shaping
+*/
 localparam MIN_DUTY = 13'h3C0;
 localparam LOW_TORQUE_BAND = 8'h3C;
-localparam GAIN_MULT= 6'h10;
+localparam GAIN_MULT = 6'h10;
+logic signed [12:0]lft_shaped;
+logic signed [12:0]rght_shaped;
+logic signed [12:0]lft_shaped_sat;
+logic signed [12:0]rght_shaped_sat;
+logic signed [12:0]mux_to_mux;
+logic signed [12:0]mux_to_mux2;
+logic signed [12:0]lft_torque_comp;
+logic signed [12:0]rght_torque_comp;
 
-/////////////////Internal Signal for PID_ss ///////////////////////
-logic signed [19:0] product_PID_ss;
-logic signed [11:0] PID_ss;
 
-//////////// Internal Signals for Lft and right torque /////////
-logic [11:0] steer_pot_lmt;  	//limited version of steer_pot (0x200 - 0xE00)
-logic signed [11:0] steer_pot_lmt_signed;
-logic signed [9:0] steer_pot_lmt_signed_shift_2;
-logic signed [11:0] steer_pot_lmt_signed_shift;
-logic signed [12:0] PID_ss_13b;
-logic signed [12:0] lft_torque;
-logic signed [12:0] rght_torque;
+// Assigns either negated MIN_DUTY + lft_torque or MIN_DUTY +lft_torque to lft_torque_comp
+assign lft_torque_comp = lft_torque[12] ? (lft_torque - MIN_DUTY) : (lft_torque + MIN_DUTY);
+// Takes the absolute value of lft_torque;
+assign abs_lft_torque = lft_torque[12] ? (~lft_torque+ 13'h001) : lft_torque[12:0];
 
-/////////////// Internal Signals for Lft shaped /////////
-logic signed [12:0] lft_torque_comp;
-logic signed [12:0] lft_torque_abs;
-logic signed [12:0] lft_torque_m_MIN;
-logic signed [12:0] lft_torque_p_MIN;
-logic signed [12:0] lft_torque_times_GAIN;
-logic signed [12:0] lft_torque_low_band;
-logic signed [12:0] lft_shaped;
+// Creates the final mux connection and determines the output for lft_shaped
+assign mux_to_mux = (abs_lft_torque > LOW_TORQUE_BAND) ?  lft_torque_comp : ($signed(GAIN_MULT) * lft_torque);
+assign lft_shaped = pwr_up ? mux_to_mux  : 13'h0000 ;
+ 
+/***
+Everything below is the same as above, but instead shifted to be for the right side.
+*/
 
-/////////////// Internal Signals for rhgt shaped /////////
-logic signed [12:0] rght_torque_comp;
-logic signed [12:0] rght_torque_abs;
-logic signed [12:0] rght_torque_m_MIN;
-logic signed [12:0] rght_torque_p_MIN;
-logic signed [12:0] rght_torque_times_GAIN;
-logic signed [12:0] rght_torque_low_band;
-logic signed [12:0] rght_shaped;
+assign rght_torque_comp = rght_torque[12] ? (rght_torque - MIN_DUTY) : (rght_torque + MIN_DUTY) ;
 
-/////////////// Internal Signals for too_fast /////////
-logic too_fast_lft;
-logic too_fast_rght;
+assign abs_rght_torque = rght_torque[12] ? (~rght_torque + 13'h001) : rght_torque[12:0];
 
-///////////////Calculation for PID_ss/////////////////////////
-assign product_PID_ss = $signed(PID_cntrl)*$signed({0,ss_tmr});
-assign PID_ss = product_PID_ss[19:8];
+assign mux_to_mux2 = (abs_rght_torque > LOW_TORQUE_BAND) ?  rght_torque_comp : ($signed(GAIN_MULT) * rght_torque) ;
+assign rght_shaped = pwr_up ?  mux_to_mux2 :  13'h0000;
 
-/////////// Calculations for lft_torque and rght_torque////////////
-assign steer_pot_lmt = (steer_pot[11:8] >= 4'hE) ? (12'hE00) : ((steer_pot[11:8] <= 4'h2) ? 12'h200 : steer_pot);
-assign steer_pot_lmt_signed = $signed(steer_pot_lmt - 12'h7FF);
-assign steer_pot_lmt_signed_shift_2 = $signed(steer_pot_lmt_signed[11:2]) - $signed(steer_pot_lmt_signed[11:4]);
-assign steer_pot_lmt_signed_shift = $signed({{3{steer_pot_lmt_signed_shift_2[9]}}, steer_pot_lmt_signed_shift_2[8:0]});
 
-assign PID_ss_13b = {PID_ss[11], PID_ss};
 
-assign lft_torque = (en_steer) ? (PID_ss_13b + steer_pot_lmt_signed_shift):(PID_ss_13b);
-assign rght_torque = (en_steer) ? (PID_ss_13b - steer_pot_lmt_signed_shift) :(PID_ss_13b);
+// Saturates both lft_shaped and rght_shaped to be 12 bit signed.
+assign lft_spd = (lft_shaped[12] && !lft_shaped [11]) ? 12'h800 : (!lft_shaped[12] && lft_shaped[11]) ? 12'h7FF : lft_shaped[11:0] ;
+assign rght_spd = (rght_shaped[12] && !rght_shaped[11])? 12'h800 : (!rght_shaped[12] && rght_shaped[11]) ? 12'h7FF: rght_shaped[11:0];
 
-//////////////Calculations for lft_shaped////////////////
-assign lft_torque_m_MIN = lft_torque - MIN_DUTY;
-assign lft_torque_p_MIN = lft_torque + MIN_DUTY;
-assign lft_torque_times_GAIN = $signed(lft_torque) * $signed(GAIN_MULT);
-assign lft_torque_comp = (lft_torque[12]) ? (lft_torque_m_MIN) : (lft_torque_p_MIN);
-assign lft_torque_abs = (lft_torque[12]) ? (~lft_torque + 13'h001) : (lft_torque);
-assign lft_torque_low_band = (lft_torque_abs > LOW_TORQUE_BAND) ? (lft_torque_comp) 
-	: (lft_torque_times_GAIN);
-assign lft_shaped = (pwr_up== 1'b0) ? (13'h0000) : (lft_torque_low_band);
+// Checks if either left or right are going too fast, if so, assigns bit value to send forward to too_fast.
+logic too_fast_lft, too_fast_rght;
+assign too_fast_lft = ($signed(lft_spd) > $signed(12'd1792));
+assign too_fast_rght = ($signed(rght_spd) > $signed(12'd1792));
 
-//////////////Calculations for rght_shaped////////////////
-assign rght_torque_m_MIN = rght_torque - MIN_DUTY;
-assign rght_torque_p_MIN = rght_torque + MIN_DUTY;
-assign rght_torque_times_GAIN = $signed(rght_torque) * $signed(GAIN_MULT);
-assign rght_torque_comp = (rght_torque[12]) ? (rght_torque_m_MIN) : (rght_torque_p_MIN);
-assign rght_torque_abs = (rght_torque[12]) ? (~rght_torque + 13'h001 ) : (rght_torque);
-assign rght_torque_low_band = (rght_torque_abs > LOW_TORQUE_BAND) ? 
-	(rght_torque_comp) : (rght_torque_times_GAIN);
-assign rght_shaped = (pwr_up == 1'b0) ? (13'h0000) : (rght_torque_low_band);
-
-//////////////Calculations for lft_spd, too_fast, and rght_spd////////////////
-assign lft_spd = (lft_shaped[12] & ~&lft_shaped[11]) ? 12'h800 : (lft_shaped[12] ? 
-	lft_shaped[11:0]: ((~lft_shaped[12] & |lft_shaped[11]) ? 12'h7FF : lft_shaped[11:0]));
-assign rght_spd = (rght_shaped[12] & ~&rght_shaped[11]) ? 12'h800 : (rght_shaped[12] ? 
-	rght_shaped[11:0]: ((~rght_shaped[12] & |rght_shaped[11]) ? 12'h7FF : rght_shaped[11:0]));
-assign too_fast_lft = $signed(lft_spd) > $signed(12'd1792);
-assign too_fast_rght = $signed(rght_spd) > $signed(12'd1792);
-assign too_fast = too_fast_lft || too_fast_rght;
+// If either left or right are too fast, it's going too fast.
+assign too_fast = (too_fast_lft | too_fast_rght);
 
 endmodule
+
+

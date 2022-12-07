@@ -54,7 +54,7 @@ end
 
 /////////////////// PID cntrl calulation//////////////////////////
 assign P_term = $signed(ptch_err_sat) * $signed(P_COEFF);		//calculate P I D terms
-generate if(FAST_SIM)begin
+generate if(fast_sim)begin
 	assign ss_tmr_inc = 9'd256;
 	assign I_term = (integrator[17] & ~&integrator[16:15]) ? 15'h8000
 		: (~integrator[17] & |integrator[16:15] ? (15'h3FFF) : (integrator[15:1]));

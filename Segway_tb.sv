@@ -52,11 +52,54 @@ UART_tx iTX(.clk(clk),.rst_n(rst_n),.TX(RX_TX),.trmt(send_cmd),.tx_data(cmd),.tx
 rst_synch iRST(.clk(clk),.RST_n(RST_n),.rst_n(rst_n));
 
 initial begin
+	RunAllTests;
   
-  /// Your magic goes here ///
   
   $stop();
 end
+task DUT_reset;
+  RST_n = 0;
+  @(posedge clk);
+  @(negedge clk);
+  RST_n = 1;
+  @(posedge clk);
+  endtask
+  
+  task RunAllTests;
+	init;
+	riderOnNoGo;
+  endtask
+
+  task init;
+  clk = 0;
+  rider_lean = 16'h0;
+  cmd = 8'h0;
+  send_cmd = 0;
+  ld_cell_lft = 0;
+  ld_cell_rght = 0;
+  batt = 12'hFFE;
+  steerPot = 0;
+  RST_n = 0;
+  endtask 
+
+  task riderOnNoGo;
+  ld_cell_lft = 12'h156;
+  ld_cell_rght = 12'h156;
+  clockInput(3000);
+  assert (iDUT.pwr_up === 0);
+  $display("Yahoo! riderOnNoGo Test passed!!!");
+
+  endtask;
+
+  task testSteer;
+  
+  endtask
+
+  task clockInput;
+  input integer clocks;
+  repeat(clocks)@(posedge clk);
+  @(negedge clk);
+  endtask
 
 always
   #10 clk = ~clk;

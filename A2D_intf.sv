@@ -1,4 +1,4 @@
-module A2D_intf(clk, rst_n, nxt, left_ld, right_ld, steer_pot, batt, SS_n, SCLK, MOSI, MISO);
+module A2D_intf(clk, rst_n, nxt, lft_ld, rght_ld, steer_pot, batt, SS_n, SCLK, MOSI, MISO);
 
 input clk, rst_n, nxt, MISO;
 output SS_n, SCLK, MOSI;
@@ -6,7 +6,7 @@ output SS_n, SCLK, MOSI;
 logic wrt, update, en_r, en_l, en_batt, en_steer, done;
 logic [15:0] rd_data, wt_data;
 logic [2:0] channel;
-output logic [11:0] left_ld, right_ld, batt, steer_pot;
+output logic [11:0] lft_ld, rght_ld, batt, steer_pot;
 logic [1:0] round_count;
 typedef enum reg [2:0] {IDLE, SEND1, WAIT, SEND2} state_t;
 state_t state, nxt_state;
@@ -41,15 +41,15 @@ always_ff@(posedge clk, negedge rst_n)
 
 always_ff@(posedge clk, negedge rst_n)
     if (!rst_n)
-        right_ld <= 12'h0;
+        rght_ld <= 12'h0;
     else if (en_r && update)
-        right_ld <= rd_data[11:0];
+        rght_ld <= rd_data[11:0];
 
 always_ff@(posedge clk, negedge rst_n)
     if (!rst_n)
-        left_ld <= 12'h0;
+        lft_ld <= 12'h0;
     else if (en_l && update)
-        left_ld <= rd_data[11:0];
+        lft_ld <= rd_data[11:0];
 always_ff@(posedge clk, negedge rst_n)
     if (!rst_n)
         steer_pot <= 12'h0;
