@@ -1,3 +1,4 @@
+`timescale 1ns/1ps
 module piezo_drv(batt_low, too_fast, en_steer, clk, rst_n, piezo, piezo_n);
 
 //inputs and outputs

@@ -1,11 +1,15 @@
-module steer_en(input logic [11:0]lft_ld, logic [11:0]rght_ld, input logic clk, rst_n, en_steer, rider_off);
+`timescale 1ns/1ps
+module steer_en(lft_ld, rght_ld, clk, rst_n, en_steer, rider_off);
 
+input logic [11:0]lft_ld, rght_ld;
+input wire clk, rst_n, en_steer, rider_off;
 logic sum_lt_min, sum_gt_min, tmr_full, diff_gt_15_16, diff_gt_1_4, clr_tmr;
 parameter MIN_RIDER_WT = 12'h200;
 parameter WT_HYSTERESIS = 12'h040;
 steer_en_SM iSTATE(.*);
 
-parameter fast_sim = 1;
+
+parameter fast_sim = 0;
 logic [12:0] sum;
 logic signed [11:0] diff;
 logic [11:0] abs_diff;
@@ -24,23 +28,8 @@ assign diff_gt_15_16 = (sum - {5'b0, sum[12:5]} > abs_diff);
 
 assign tmr_full = fast_sim ? &tmr[14:0] : &tmr[25:0];
 
-always_ff@(posedge clk)
+always@(posedge clk)
 if(clr_tmr) tmr <= 0;
 else tmr <= tmr + 1;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 endmodule

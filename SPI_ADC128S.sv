@@ -1,3 +1,4 @@
+`timescale 1ns/1ps
 module SPI_ADC128S(clk,rst_n,SS_n,SCLK,MISO,MOSI,A2D_data,cmd,rdy);
   //////////////////////////////////////////////////|
   // Model of a SPI Slave similar to what might be ||
@@ -43,7 +44,7 @@ module SPI_ADC128S(clk,rst_n,SS_n,SCLK,MISO,MOSI,A2D_data,cmd,rdy);
 	  end
 	else
 	  begin
-	    SCLK_ff1 <= SCLK;
+	  SCLK_ff1 <= SCLK;
 		SCLK_ff2 <= SCLK_ff1;
 	  end  
 	  

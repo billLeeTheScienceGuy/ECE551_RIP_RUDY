@@ -1,3 +1,4 @@
+`timescale 1ns/1ps
 module SegwayModel(clk,RST_n,SS_n,SCLK,MISO,MOSI,INT,PWM1_lft,PWM2_lft,
                    PWM1_rght,PWM2_rght,rider_lean);
   //////////////////////////////////////////////////
@@ -96,9 +97,9 @@ module SegwayModel(clk,RST_n,SS_n,SCLK,MISO,MOSI,INT,PWM1_lft,PWM2_lft,
   //// Infer main SPI shift register ////
   always_ff @(negedge SCLK, negedge POR_n)
     if (!POR_n)
-	  shft_reg_tx <= 16'h0;
+	  shft_reg_tx <= 16'h0000;
 	else if (init)
-	  shft_reg_tx <= 16'h0;
+	  shft_reg_tx <= 16'h0000;
 	else if (ld_tx_reg)						// occurs at beginning and middle of 16-bit transaction
 	  shft_reg_tx <= {tx_data,8'h00};
 	else if (shft_tx)
@@ -107,13 +108,13 @@ module SegwayModel(clk,RST_n,SS_n,SCLK,MISO,MOSI,INT,PWM1_lft,PWM2_lft,
   //// Infer main SPI shift register ////
   always_ff @(posedge SCLK, negedge POR_n)
     if (!POR_n)
-	  shft_reg_rx <= 16'h0;
+	  shft_reg_rx <= 16'h0000;
 	else if (!SS_n)
 	  shft_reg_rx <= {shft_reg_rx[14:0],MOSI};
 	  
   always_ff @(negedge SCLK)
     if (init)
-	  bit_cnt <= 4'b0;
+	  bit_cnt <= 4'b0000;
 	else if (shft_tx)
 	  bit_cnt <= bit_cnt + 1;
 	  
@@ -306,7 +307,7 @@ module SegwayModel(clk,RST_n,SS_n,SCLK,MISO,MOSI,INT,PWM1_lft,PWM2_lft,
   // Next is modeling physics of Segway //
   ///////////////////////////////////////
   always @(posedge calc_physics) begin
-    torque_lft = torque(lft_duty);
+  torque_lft = torque(lft_duty);
 	torque_rght = torque(rght_duty);
 	omega_lft = omega(omega_lft,torque_lft);		// angular velocity is integral of torque
 	omega_rght = omega(omega_rght,torque_rght);		// angular velocity is integral of torque
@@ -326,13 +327,13 @@ module SegwayModel(clk,RST_n,SS_n,SCLK,MISO,MOSI,INT,PWM1_lft,PWM2_lft,
     POR_n = 0;
 	clr_INT = 0;
 	internal_clk = 0;
-	omega_lft = 16'h0000;
-	omega_rght = 16'h0000;
-	theta_lft = 20'h00000;
-	theta_rght = 20'h00000;
-	omega_platform = 16'h0000;
-	theta_platform = 16'h0000;
-	az = 16'h0000;
+	omega_lft = 16'h0;
+	omega_rght = 16'h0;
+	theta_lft = 20'h0;
+	theta_rght = 20'h0;
+	omega_platform = 16'h0;
+	theta_platform = 16'h0;
+	az = 16'h0;
 	#10;
 	POR_n = 1;
   end
@@ -390,12 +391,12 @@ module SegwayModel(clk,RST_n,SS_n,SCLK,MISO,MOSI,INT,PWM1_lft,PWM2_lft,
 	
 	friction = (omega_abs>14'h0400) ? {{10{omega1[15]}},omega1[15:10]} :
 	           (omega1[15]) ? 16'hFFFF :
-               (|omega1) ? 16'h0001 : 16'h0000;
+               (|omega1) ? 16'h0001 : 16'h0;
 	
 	torque_abs = (torque[15]) ? ~torque : torque;
 	
 	if ((torque_abs<FRICTION_TORQUE) && (omega_abs<16'h0030))
-	  omega = 16'h0000;
+	  omega = 16'h0;
 	else
 	  omega = omega1 + {{6{torque[15]}},torque[15:6]} - friction;
   endfunction
@@ -415,7 +416,7 @@ module SegwayModel(clk,RST_n,SS_n,SCLK,MISO,MOSI,INT,PWM1_lft,PWM2_lft,
 	
 	friction = (omega_abs>14'h0400) ? {{10{omega1[15]}},omega1[15:10]} :
 	           (omega1[15]) ? 16'hFFFF :
-               (|omega1) ? 16'h0001 : 16'h0000;
+               (|omega1) ? 16'h0001 : 16'h0;
 			   
 	omega_plat = omega1 + {{3{torque[15]}},torque[15:3]} - friction;
 	  

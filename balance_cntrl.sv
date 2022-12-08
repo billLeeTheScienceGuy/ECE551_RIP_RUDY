@@ -1,5 +1,5 @@
 
-
+`timescale 1ns/1ps
 module balance_cntrl(lft_spd, rght_spd, too_fast, clk, rst_n, vld, ptch,
 ptch_rt, pwr_up, rider_off, steer_pot, en_steer);
 

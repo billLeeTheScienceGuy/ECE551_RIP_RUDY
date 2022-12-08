@@ -1,3 +1,4 @@
+`timescale 1ns/1ps
 module UART_tx(clk, rst_n, tx_data, trmt, tx_done, TX);
 
 input clk, rst_n, trmt;
@@ -18,7 +19,7 @@ localparam CLKS_PER_BIT = 12'hA2C;
 // Possible outcomes: baud_cnt <= 0, baud_cnt maintains, baud_cnt++.
 always_ff@(posedge clk, negedge rst_n) begin
 	if(!rst_n)
-		baud_cnt <= 12'h000;
+		baud_cnt <= 12'h0;
 	else if (load || shift) 
 		baud_cnt <= 0;
 	else if(transmitting) 
@@ -71,8 +72,7 @@ nxt_state = state;
 				nxt_state = IDLE;
 			end
 			else 
-
-				transmitting = 1;
+			transmitting = 1;
 		// This default state is IDLE.
 		default: if(trmt)
 			begin 

@@ -1,4 +1,5 @@
 `default_nettype none
+`timescale 1ns/1ps
 module A2D_intf_tb();
 
 logic clk, rst_n, nxt, MISO;

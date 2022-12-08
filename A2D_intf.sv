@@ -1,3 +1,4 @@
+`timescale 1ns/1ps
 module A2D_intf(clk, rst_n, nxt, lft_ld, rght_ld, steer_pot, batt, SS_n, SCLK, MOSI, MISO);
 
 input clk, rst_n, nxt, MISO;

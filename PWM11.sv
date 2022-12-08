@@ -1,3 +1,4 @@
+`timescale 1ns/1ps
 module PWM11(clk, rst_n, duty, PWM_sig, PWM_synch, OVR_I_blank_n);
 
 input clk, rst_n;

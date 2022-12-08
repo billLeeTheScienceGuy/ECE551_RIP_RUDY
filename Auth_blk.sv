@@ -1,3 +1,4 @@
+`timescale 1ns/1ps
 module Auth_blk(clk, rst_n, RX, rider_off, pwr_up);
 
 //inputs for Auth_blk
@@ -15,7 +16,7 @@ logic clr_rx_rdy;
 logic [7:0] rx_data;
 
 //Declare UART_rx 
-UART_rx rx (.clk(clk), .rst_n(rst_n), .RX(RX), .clr_rdy(clr_rx_rdy), .rx_data(rx_data), .rdy(rx_rdy));
+UART_rx rx(.clk(clk), .rst_n(rst_n), .RX(RX), .clr_rdy(clr_rx_rdy), .rx_data(rx_data), .rdy(rx_rdy));
 
 //States for Auth_SM
 typedef enum logic [1:0] {OFF, PWR1, PWR2} state_t;

@@ -1,3 +1,4 @@
+`timescale 1ns/1ps
 module inert_intf(clk,rst_n,ptch,ptch_rt,vld,SS_n,SCLK,
                   MOSI,MISO,INT);
  

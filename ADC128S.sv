@@ -1,3 +1,4 @@
+`timescale 1ns/1ps
 module ADC128S(clk,rst_n,SS_n,SCLK,MISO,MOSI);
   //////////////////////////////////////////////////|
   // Model of a National Semi Conductor ADC128S    ||

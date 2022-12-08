@@ -1,10 +1,11 @@
+`timescale 1ns/1ps
 module SegwayMath(PID_cntrl,ss_tmr,steer_pot,en_steer,pwr_up,lft_spd,rght_spd,too_fast);
 
 input signed [11:0]PID_cntrl;
 input [7:0]ss_tmr;
 input [11:0]steer_pot;
-input en_steer;
-input pwr_up;
+input wire en_steer;
+input wire pwr_up;
 output [11:0]lft_spd;
 output [11:0]rght_spd;
 output too_fast; 
@@ -53,8 +54,6 @@ localparam LOW_TORQUE_BAND = 8'h3C;
 localparam GAIN_MULT = 6'h10;
 logic signed [12:0]lft_shaped;
 logic signed [12:0]rght_shaped;
-logic signed [12:0]lft_shaped_sat;
-logic signed [12:0]rght_shaped_sat;
 logic signed [12:0]mux_to_mux;
 logic signed [12:0]mux_to_mux2;
 logic signed [12:0]lft_torque_comp;
@@ -88,7 +87,6 @@ assign lft_spd = (lft_shaped[12] && !lft_shaped [11]) ? 12'h800 : (!lft_shaped[1
 assign rght_spd = (rght_shaped[12] && !rght_shaped[11])? 12'h800 : (!rght_shaped[12] && rght_shaped[11]) ? 12'h7FF: rght_shaped[11:0];
 
 // Checks if either left or right are going too fast, if so, assigns bit value to send forward to too_fast.
-logic too_fast_lft, too_fast_rght;
 assign too_fast_lft = ($signed(lft_spd) > $signed(12'd1792));
 assign too_fast_rght = ($signed(rght_spd) > $signed(12'd1792));
 
