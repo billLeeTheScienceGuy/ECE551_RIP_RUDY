@@ -20,10 +20,10 @@ always@(posedge clk, negedge rst_n)
     else if(update)
         round_count++;
 
-assign en_l = round_count == 2'b00;
-assign en_r = round_count == 2'b01;
-assign en_steer = round_count == 2'b10;
-assign en_batt = round_count == 2'b11;
+assign en_l = update && round_count == 2'b00;
+assign en_r = update && round_count == 2'b01;
+assign en_steer = update && round_count == 2'b10;
+assign en_batt = update && round_count == 2'b11;
 
 assign channel = en_l ? 3'b0 : en_r ? 3'b100 : en_steer ? 3'b101 : 3'b110;
 
@@ -65,7 +65,6 @@ always_comb begin
     case(state)
     IDLE: if(nxt) begin 
         wrt = 1;
-        update = 0;
         nxt_state = SEND1;
     end
     SEND1: if (done) begin 
