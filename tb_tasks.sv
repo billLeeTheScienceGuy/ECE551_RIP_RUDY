@@ -13,9 +13,12 @@ task init;
     steerPot = 0;
     OVR_I_lft = 0;
     OVR_I_rght = 0;
-    @(negedge clk);
-    RST_n = 1;
     repeat(2)@(negedge clk);
+    RST_n = 1;
+    $display("We gon check for the inertial sensor to be initialized.");
+    wait(iDUT.iNEMO.state === 3'b110);
+    $display("Initialized! Lets ya some hoos.");
+   
 endtask 
 
 task riderOn_noGo;
@@ -26,8 +29,6 @@ endtask
 
 task riderOn_go;
     send_command(8'h67, clk, send_cmd , cmd_sent, cmd);
-    repeat(300000)@(posedge clk);
-    repeat(10)@(posedge iDUT.iNEMO.wrt);
     $display("Running test riderOn_go");
     assert(iDUT.pwr_up === 1);
     $display("Yahoo! riderOn_go Test passed!!!");
@@ -36,55 +37,49 @@ endtask
 task riderLeaning;
     $display("Running test riderLeaning");
     rider_lean = $signed(16'h1FFF);
+    repeat(10000)@(negedge clk);
     assert(iPHYS.net_torque === 16'h1FFF);
     $display("Yahoo! riderLeaning Test passed!!!");
 endtask
 
+task segwayShutdown;
+    send_command(8'h73, clk, send_cmd, cmd_sent, cmd);
+    if(iDUT.pwr_up === 0  & iDUT.rider_off === 1) begin
+		$display("ERROR: pwr_up should be 1 when rider_off is 0");
+		$stop;
+	end
+	else if(iDUT.pwr_up & iDUT.rider_off) begin
+		$display("ERROR: pwr_up should be 0 when rider_off is 1");
+		$stop;
+    end
+    $display("Yahoo! segwayShutdown Test passed!!!");
+
+endtask
+
+
+// This test is currently not working, it's sad, but I'm not sure how to check this exactly.
+/*
 task chargeYourSegway;
     $display("Running test chargeYourSegway");
     DUT_reset;
     batt = batt - 12'h500;
-    iA2D.iSPI.shft_reg_rx = batt;
-    repeat(10)@(posedge clk);
-    iA2D.iSPI.SCLK_ff1 = 1;
-    iA2D.iSPI.SCLK_ff2 = 0;
-    assert (iDUT.iBUZZ.batt_low === 1);
+    repeat(300000)@(posedge clk);
+    assert (iDUT_batt_low === 1);
     $display("Yahoo! chargeYourSegway Test passed!!!");
-endtask
+endtask */
 
-task automatic waitForSignal (ref signal, clk, input int clocks);
-    fork
-        begin : timeout 
-            repeat(clocks) @(posedge clk);
-            $display("Timed out whilst waiting for signal");
-            $stop();
-        end
-        begin @(posedge signal);
-            disable timeout;
-        end
-    join
-endtask
 
 task automatic send_command(input [7:0]command, ref clk, send_cmd , cmd_sent, ref [7:0] cmd);
     @(negedge clk);
-    send_cmd = 1'b1;
     cmd = command;
+    send_cmd = 1'b1;
     @(negedge clk);
     send_cmd = 1'b0;
-    @(posedge iDUT.iAuth.rx.rdy);
     @(posedge cmd_sent);
     $display("Command successfully sent");
-    @(negedge clk);
+    repeat(2)@(negedge clk);
 endtask
 
-task send_s;
-    cmd = 8'h73;
-    send_cmd = 1;
-    @(negedge iDUT.clk);
-    send_cmd = 0;
-    @(cmd_sent);
-    repeat(2)@(negedge iDUT.clk);
-endtask
 
 task DUT_reset;
   RST_n = 0;

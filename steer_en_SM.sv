@@ -48,17 +48,19 @@ module steer_en_SM(clk,rst_n,tmr_full,sum_gt_min,sum_lt_min,diff_gt_1_4,
 
     case(state)
       WAITING: if(~sum_gt_min) begin
-        rider_off = 1;
+        nxt_state = IDLE;
       end
       else if (diff_gt_1_4) begin
-        clr_tmr= 1;
+        clr_tmr = 1;
       end
       else if (tmr_full) begin
         nxt_state = STEERING;
         en_steer = 1;
       end
-      STEERING: if(~sum_gt_min)
+      STEERING: if(~sum_gt_min) begin
         rider_off = 1;
+        nxt_state = IDLE;
+      end
       else if(diff_gt_15_16) begin
         clr_tmr = 1;
         nxt_state = WAITING;
@@ -66,9 +68,7 @@ module steer_en_SM(clk,rst_n,tmr_full,sum_gt_min,sum_lt_min,diff_gt_1_4,
       else en_steer = 1; 
       // Default state is IDLE or "INITIAL"
       default: 
-      if(~sum_gt_min) 
-        rider_off = 1;
-      else if (sum_gt_min) begin
+      if (sum_gt_min) begin
         clr_tmr = 1;
         nxt_state = WAITING;
       end

@@ -23,7 +23,6 @@ reg OVR_I_lft, OVR_I_rght;
 ///// Internal registers for testing purposes??? /////////
 
 
-
 ////////////////////////////////////////////////////////////////
 // Instantiate Physical Model of Segway with Inertial sensor //
 //////////////////////////////////////////////////////////////	
@@ -55,27 +54,24 @@ UART_tx iTX(.clk(clk),.rst_n(rst_n),.TX(RX_TX),.trmt(send_cmd),.tx_data(cmd),.tx
 ///////////////////////////////////
 rst_synch iRST(.clk(clk),.RST_n(RST_n),.rst_n(rst_n));
 
+
 initial begin
 	init;
     ld_cell_lft = 12'h156;
     ld_cell_rght = 12'h156;
 	batt = 12'h900;
 	steerPot = 12'h100;
-    $display("The first test is to see if you are amazed by the dramatic effect of the testing process.");
-    #30000;
     $display("Get ready!");
-    #30000;
 	riderOn_noGo;
-    #30000;
     $display("Sending go command");
-    #30000;
 	riderOn_go;
 	riderLeaning;
-    chargeYourSegway;
-
-    #3000000;
-    $display("Wow! Unless it says otherwise, you have passed all tests! Hopefully, the grader 
-    has passed the test of being amazed by the tests. Great job");
+    //chargeYourSegway;
+    $display("Sending stop command");
+    ld_cell_lft = 12'h0;
+    ld_cell_rght = 12'h0;
+    segwayShutdown;
+    $display("Wow! Unless it says otherwise, you have passed all tests! Great job");
   $stop();
 end
 
