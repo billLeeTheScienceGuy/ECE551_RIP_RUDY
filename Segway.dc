@@ -1,0 +1,70 @@
+read_file -format sverilog {SegwayMath.sv PID.sv balance_cntrl.sv UART_rx.sv \
+Auth_blk.sv SPI_mnrch.sv inertial_integrator.sv inert_intf.sv steer_en.sv mtr_drv.sv \
+A2D_intf.sv rst_synch.sv piezo_drv.sv Segway.sv}
+
+set current_design Segway
+
+##############################
+# Constrain and Assign Clock #
+##############################
+create_clock -name "clk" -period 2.25 {clk}
+set_dont_touch_network [find port clk]
+
+##############################################
+# Constrain Input Timings and Drive Strength #
+##############################################
+set prim_inputs_1 [remove_from_collection [all_inputs] [find port clk]]
+set prim_inputs [remove_from_collection $prim_inputs_1 [find port rst_n]]
+set_input_delay -clock clk 0.25 [copy_collection $prim_inputs]
+set_driving_cell -lib_cell NAND2X2_LVT -library \
+saed32lvt_tt0p85v25c [copy_collection $prim_inputs]
+
+#####################################
+# Constrain Output Timings and Load #
+#####################################
+set_output_delay -clock clk 0.35 [all_outputs]
+set_load 0.005 [all_outputs]
+
+##################################
+# Set Wireload & Transition Time #
+##################################
+set_max_transition 0.1 [current_design]
+set_wire_load_model -name 16000 \
+-library saed32lvt_tt0p85v25c
+
+###############
+# 1st Compile #
+###############
+compile -map_effort high
+
+#########################
+# Add Clock Uncertainty #
+#########################
+set_clock_uncertainty 0.15 clk
+
+#####################
+# Flatten Hierarchy #
+#####################
+ungroup -all -flatten
+
+###########################################
+# Tell Synopsys that these registers have #
+#  more than one clock cycle to resolve   #
+###########################################
+set_multicycle_path 2 –setup –from [find pin iNEMO/ptch_*_reg*/CLK]
+set_multicycle_path 2 –setup –from [find pin iNEMO/AZ*_reg*/CLK]
+set_multicycle_path 2 –hold –from [find pin iNEMO/ptch_*_reg*/CLK]
+set_multicycle_path 2 –hold –from [find pin iNEMO/AZ*_reg*/CLK]
+set_multicycle_path 2 –hold –from [find pin iBAL/iCNTRL/ss_tmr_reg*/CLK]
+set_multicycle_path 2 –hold –from [find pin iNEMO/ss_tmr_reg*/CLK]
+
+###############
+# 2nd Compile #
+###############
+compile -map_effort low
+
+###########################
+# Report vg file and Area #
+###########################
+report_area > area.txt
+write -format verilog Segway -output Segway.vg
