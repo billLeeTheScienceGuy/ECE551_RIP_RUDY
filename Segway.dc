@@ -1,6 +1,4 @@
-read_file -format sverilog {SegwayMath.sv PID.sv balance_cntrl.sv UART_rx.sv \
-Auth_blk.sv SPI_mnrch.sv inertial_integrator.sv inert_intf.sv steer_en.sv mtr_drv.sv \
-A2D_intf.sv rst_synch.sv piezo_drv.sv Segway.sv}
+read_file -format sverilog {SegwayMath.sv PID.sv balance_cntrl.sv UART_rx.sv Auth_blk.sv SPI_mnrch.sv inertial_integrator.sv inert_intf.sv steer_en_SM.sv steer_en.sv PWM11.sv mtr_drv.sv A2D_intf.sv rst_synch.sv piezo_drv.sv Segway.sv}
 
 set current_design Segway
 
@@ -51,17 +49,17 @@ ungroup -all -flatten
 # Tell Synopsys that these registers have #
 #  more than one clock cycle to resolve   #
 ###########################################
-set_multicycle_path 2 –setup –from [find pin iNEMO/ptch_*_reg*/CLK]
-set_multicycle_path 2 –setup –from [find pin iNEMO/AZ*_reg*/CLK]
-set_multicycle_path 2 –hold –from [find pin iNEMO/ptch_*_reg*/CLK]
-set_multicycle_path 2 –hold –from [find pin iNEMO/AZ*_reg*/CLK]
-set_multicycle_path 2 –hold –from [find pin iBAL/iCNTRL/ss_tmr_reg*/CLK]
-set_multicycle_path 2 –hold –from [find pin iNEMO/ss_tmr_reg*/CLK]
+set_multicycle_path 2 -setup -from [find pin iNEMO/ptch_*_reg*/CLK]
+set_multicycle_path 2 -setup -from [find pin iNEMO/AZ*_reg*/CLK]
+set_multicycle_path 2 -hold -from [find pin iNEMO/ptch_*_reg*/CLK]
+set_multicycle_path 2 -hold -from [find pin iNEMO/AZ*_reg*/CLK]
+set_multicycle_path 2 -setup -from [find pin iBAL/iCNTRL/ss_tmr_reg*/CLK]
+set_multicycle_path 2 -hold -from [find pin iBAL/iCNTRL/ss_tmr_reg*/CLK]
 
 ###############
 # 2nd Compile #
 ###############
-compile -map_effort low
+compile -map_effort medium
 
 ###########################
 # Report vg file and Area #

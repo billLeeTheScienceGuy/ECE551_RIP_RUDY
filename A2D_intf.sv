@@ -16,7 +16,7 @@ always@(posedge clk, negedge rst_n)
     if(!rst_n)
         round_count <= 2'b0;
     else if(update)
-        round_count++;
+        round_count <= round_count + 1'b1;
 assign en_l = round_count == 2'b00;
 assign en_r = round_count == 2'b01;
 assign en_steer = round_count == 2'b10;
