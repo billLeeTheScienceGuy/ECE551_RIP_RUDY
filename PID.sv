@@ -26,8 +26,8 @@ logic signed [17:0]ptch_err_sat_ext;
 logic ov;
 
 // Sign extends ptch_err_sat to add with integrator.
-assign ptch_err_sat_ext = {{8{ptch_err_sat[9]}}, ptch_err_sat[9:0]};
-assign adder = ptch_err_sat_ext[17:0] + integrator[17:0];
+assign ptch_err_sat_ext = $signed({{8{ptch_err_sat[9]}}, ptch_err_sat[9:0]});
+assign adder = $signed(ptch_err_sat_ext[17:0] + integrator[17:0]);
 
 // Checks MSB of both operands and sees if they match, otherwise, it overflowed.
 assign ov = (integrator[17] === ptch_err_sat_ext[17] && adder[17] !== integrator[17]) ? 1'b1: 1'b0;
@@ -56,25 +56,25 @@ always_ff@(posedge clk, negedge rst_n) begin
 end
 
 // Sets the upper bits of timer to ss_tmr.
-assign ss_tmr = timer[26:19];
+assign ss_tmr = $signed(timer[26:19]);
 
 // ptch_err_sat is the 10-bit saturated version of the 16-bit ptch, 
 // set to the maximum positive value if too high to represent or set to the most negative value if too negative to represent.
-assign ptch_err_sat = (~ptch[15] & |ptch[14:9]) ? 10'h1FF : (ptch[15] & ~&ptch[14:9]) ? 10'h200 :
-ptch[9:0];
+assign ptch_err_sat = $signed((~ptch[15] & |ptch[14:9]) ? 10'h1FF : (ptch[15] & ~&ptch[14:9]) ? 10'h200 :
+ptch[9:0]);
 
 // P_term is the 10-bit saturated ptch multiplied by the P_COEFF
 assign P_term = $signed(ptch_err_sat)* $signed(P_COEFF);
 
 // I_term is integrator divided by 64, so shifted 6 bits
 generate if(fast_sim)
-	assign I_term = (~integrator[17] & |integrator[16:15]) ? 15'h3FFF : (integrator[17] & ~&integrator[16:15]) ? 15'h800 : integrator[15:1];
+	assign I_term = $signed((~integrator[17] & |integrator[16:15]) ? 15'h3FFF : (integrator[17] & ~&integrator[16:15]) ? 15'h800 : integrator[15:1]);
 else
 	assign I_term =  {{3{integrator[17]}}, integrator[17:6]};
 endgenerate
 
 // D_term is ptch_rt divided by 64, so shifted 6 bits, and is then 1's complemented.
-assign D_term = {{3{~ptch_rt[15]}}, ~ptch_rt[15:6]};
+assign D_term = $signed({{3{~ptch_rt[15]}}, ~ptch_rt[15:6]});
 
 // Temp variable to use for saturation, currently is a 16-bit sum of P, I, D terms
 
