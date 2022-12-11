@@ -64,11 +64,14 @@ initial begin
     $display("Get ready!");
 	riderOn_noGo;
     $display("Sending go command");
+	DUT_reset;
 	riderOn_go;
+	DUT_reset;
 	riderLeaning;
     //chargeYourSegway;
     $display("Sending stop command");
-    ld_cell_lft = 12'h0;
+    DUT_reset;
+	ld_cell_lft = 12'h0;
     ld_cell_rght = 12'h0;
     segwayShutdown;
     $display("Wow! Unless it says otherwise, you have passed all tests! Great job");

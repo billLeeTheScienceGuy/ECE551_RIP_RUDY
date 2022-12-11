@@ -21,7 +21,7 @@ assign diff = $signed(lft_ld - rght_ld);
 assign sum_lt_min = ((MIN_RIDER_WT - WT_HYSTERESIS) < sum);
 assign sum_gt_min = ((MIN_RIDER_WT + WT_HYSTERESIS) > sum);
 
-assign abs_diff = diff[11] ? ~diff + 1'b1 : diff[11:0];
+assign abs_diff = $signed(diff[11] ? ~diff + 1'b1 : diff[11:0]);
 
 assign diff_gt_1_4 = ({2'b0, sum[12:2]} > abs_diff);
 assign diff_gt_15_16 = (sum - {5'b0, sum[12:5]} > abs_diff);

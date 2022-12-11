@@ -201,8 +201,8 @@ module inert_intf(clk,rst_n,ptch,ptch_rt,vld,SS_n,SCLK,
     if (capture_AZh)
 	  AZh <= inert_data[7:0];	  
   
-  assign AZ = {AZh,AZl};
-  assign ptch_rt_raw = {ptch_rt_h,ptch_rt_l};
+  assign AZ = $signed({AZh,AZl});
+  assign ptch_rt_raw = $signed({ptch_rt_h,ptch_rt_l});
   
   generate if (fast_sim)
     assign ptch_rt = ptch_rt_raw;		// no filter needed in simulation

@@ -11,7 +11,6 @@ module Segway(clk,RST_n,INERT_SS_n,INERT_MOSI,INERT_SCLK,
   input OVR_I_lft,OVR_I_rght;			// Instantaneous over current in motor
   input RX;								// UART input from BLE module
 
-  
   output A2D_SS_n, INERT_SS_n;			// Slave selects to A2D and inertial sensor
   output A2D_MOSI, INERT_MOSI;			// MOSI signals to A2D and inertial sensor
   output A2D_SCLK, INERT_SCLK;			// SCLK signals to A2D and inertial sensor
