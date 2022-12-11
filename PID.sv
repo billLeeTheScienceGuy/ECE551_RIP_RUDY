@@ -10,7 +10,7 @@ input [15:0]ptch;
 input [15:0]ptch_rt;
 output signed [11:0]PID_cntrl;
 output signed [7:0]ss_tmr;
-localparam signed P_COEFF = 5'h0C;
+localparam signed P_COEFF = 5'h0D;
 parameter fast_sim = 1;
 localparam inc = fast_sim ? 256 : 1;
 
@@ -58,9 +58,6 @@ end
 // Sets the upper bits of timer to ss_tmr.
 assign ss_tmr = timer[26:19];
 
-	
-
-
 // ptch_err_sat is the 10-bit saturated version of the 16-bit ptch, 
 // set to the maximum positive value if too high to represent or set to the most negative value if too negative to represent.
 assign ptch_err_sat = (~ptch[15] & |ptch[14:9]) ? 10'h1FF : (ptch[15] & ~&ptch[14:9]) ? 10'h200 :
@@ -71,9 +68,9 @@ assign P_term = $signed(ptch_err_sat)* $signed(P_COEFF);
 
 // I_term is integrator divided by 64, so shifted 6 bits
 generate if(fast_sim)
-assign I_term = (~integrator[17] & |integrator[16:15]) ? 15'h3FFF : (integrator[17] & ~&integrator[16:15]) ? 15'h800 : integrator[15:1];
+	assign I_term = (~integrator[17] & |integrator[16:15]) ? 15'h3FFF : (integrator[17] & ~&integrator[16:15]) ? 15'h800 : integrator[15:1];
 else
-assign I_term =  {{3{integrator[17]}}, integrator[17:6]};
+	assign I_term =  {{3{integrator[17]}}, integrator[17:6]};
 endgenerate
 
 // D_term is ptch_rt divided by 64, so shifted 6 bits, and is then 1's complemented.

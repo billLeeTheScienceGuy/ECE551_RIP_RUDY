@@ -7,8 +7,8 @@ logic [11:0]left_ld, right_ld, batt, steer_pot;
 logic SCLK, MOSI, a2d_SS_n;
 
 
-A2D_intf A2D(.clk(clk),.rst_n(rst_n), .nxt(nxt), .left_ld(left_ld), .right_ld(right_ld),
-.steer_pot(steer_pot),.batt(batt),.a2d_SS_n(a2d_SS_n),.SCLK(SCLK),.MOSI(MOSI),.MISO(MISO));
+A2D_intf A2D(.clk(clk),.rst_n(rst_n), .nxt(nxt), .lft_ld(left_ld), .rght_ld(right_ld),
+.steer_pot(steer_pot),.batt(batt),.SS_n(a2d_SS_n),.SCLK(SCLK),.MOSI(MOSI),.MISO(MISO));
 
 ADC128S ADC(.clk(clk),.rst_n(rst_n),.MISO(MISO),.MOSI(MOSI),.SS_n(a2d_SS_n),.SCLK(SCLK));
 
@@ -58,7 +58,8 @@ initial begin
     join
     @(A2D.state == 2'b0);
     repeat(50)@(posedge clk);
-    if(right_ld !== 12'hBF1) begin
+    if(right_ld !== 12'hBF4) begin
+		$display(right_ld);
         $display("Yahtzee! Test failed, expected value for right_ld was not found.");
         $stop;
     end

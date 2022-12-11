@@ -80,8 +80,6 @@ assign abs_rght_torque = rght_torque[12] ? (~rght_torque + 13'h001) : rght_torqu
 assign mux_to_mux2 = (abs_rght_torque > LOW_TORQUE_BAND) ?  rght_torque_comp : ($signed(GAIN_MULT) * rght_torque) ;
 assign rght_shaped = pwr_up ?  mux_to_mux2 :  13'h0000;
 
-
-
 // Saturates both lft_shaped and rght_shaped to be 12 bit signed.
 assign lft_spd = (lft_shaped[12] && !lft_shaped [11]) ? 12'h800 : (!lft_shaped[12] && lft_shaped[11]) ? 12'h7FF : lft_shaped[11:0] ;
 assign rght_spd = (rght_shaped[12] && !rght_shaped[11])? 12'h800 : (!rght_shaped[12] && rght_shaped[11]) ? 12'h7FF: rght_shaped[11:0];

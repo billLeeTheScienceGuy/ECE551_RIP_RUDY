@@ -44,11 +44,11 @@ endtask
 
 task segwayShutdown;
     send_command(8'h73, clk, send_cmd, cmd_sent, cmd);
-    if(iDUT.pwr_up === 0  & iDUT.rider_off === 1) begin
+    if(iDUT.pwr_up === 0  && iDUT.rider_off === 1) begin
 		$display("ERROR: pwr_up should be 1 when rider_off is 0");
 		$stop;
 	end
-	else if(iDUT.pwr_up & iDUT.rider_off) begin
+	else if(iDUT.pwr_up && iDUT.rider_off) begin
 		$display("ERROR: pwr_up should be 0 when rider_off is 1");
 		$stop;
     end
