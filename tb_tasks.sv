@@ -36,9 +36,9 @@ endtask
 
 task riderLeaning;
     $display("Running test riderLeaning");
-    rider_lean = $signed(16'h1FFF);
+    rider_lean = $signed(16'h1F00);
     repeat(10000)@(negedge clk);
-    assert(iPHYS.net_torque === 16'h1FFF);
+    assert(iPHYS.net_torque === $signed(16'h1F00));
     $display("Yahoo! riderLeaning Test passed!!!");
 endtask
 
@@ -60,12 +60,21 @@ endtask
 
 task chargeYourSegway;
     $display("Running test chargeYourSegway");
-    DUT_reset;
     batt = batt - 12'h500;
-    repeat(900000)@(posedge clk);
+    repeat(30000)@(posedge clk);
     assert (iDUT.batt_low === 1);
     $display("Yahoo! chargeYourSegway Test passed!!!");
 endtask 
+
+task slowDown;
+    $display("Running test slow down");
+    rider_lean = $signed(16'h1FFF);
+    steerPot = 12'hE01;
+    repeat(30000)@(posedge clk);
+    assert (iDUT.iBAL.iDUTDUT.steer_pot_sat === 12'hE00);
+    assert (iDUT.too_fast === 1);
+    $display("Yahoo! slowDown Test Passed !!!");
+endtask
 
 
 task automatic send_command(input [7:0]command, ref clk, send_cmd , cmd_sent, ref [7:0] cmd);

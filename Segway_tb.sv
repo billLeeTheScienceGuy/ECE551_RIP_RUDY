@@ -59,12 +59,13 @@ initial begin
     ld_cell_lft = 12'h356;
     ld_cell_rght = 12'h356;
 	batt = 12'h900;
-	steerPot = 12'h100;
+	steerPot = 12'h200;
     $display("Get ready!");
 	riderOn_noGo;
     $display("Sending go command");
 	riderOn_go;
 	riderLeaning;
+	slowDown;
     chargeYourSegway;
     $display("Sending stop command");
 	ld_cell_lft = 12'h0;
