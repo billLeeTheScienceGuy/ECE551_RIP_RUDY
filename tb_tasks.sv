@@ -44,7 +44,8 @@ endtask
 
 task segwayShutdown;
     send_command(8'h73, clk, send_cmd, cmd_sent, cmd);
-    if(iDUT.pwr_up === 0  && iDUT.rider_off === 1) begin
+    repeat(10000)@(posedge clk);
+    if(!iDUT.pwr_up  && !iDUT.rider_off) begin
 		$display("ERROR: pwr_up should be 1 when rider_off is 0");
 		$stop;
 	end
@@ -57,16 +58,14 @@ task segwayShutdown;
 endtask
 
 
-// This test is currently not working, it's sad, but I'm not sure how to check this exactly.
-/*
 task chargeYourSegway;
     $display("Running test chargeYourSegway");
     DUT_reset;
     batt = batt - 12'h500;
-    repeat(300000)@(posedge clk);
-    assert (iDUT_batt_low === 1);
+    repeat(900000)@(posedge clk);
+    assert (iDUT.batt_low === 1);
     $display("Yahoo! chargeYourSegway Test passed!!!");
-endtask */
+endtask 
 
 
 task automatic send_command(input [7:0]command, ref clk, send_cmd , cmd_sent, ref [7:0] cmd);
@@ -88,6 +87,3 @@ task DUT_reset;
   RST_n = 1;
   @(posedge clk);
 endtask
-
-
-

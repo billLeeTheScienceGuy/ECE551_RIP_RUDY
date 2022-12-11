@@ -1,4 +1,3 @@
-
 `timescale 1ns/1ps
 
 module Segway_tb();
@@ -57,20 +56,17 @@ rst_synch iRST(.clk(clk),.RST_n(RST_n),.rst_n(rst_n));
 
 initial begin
 	init;
-    ld_cell_lft = 12'h156;
-    ld_cell_rght = 12'h156;
+    ld_cell_lft = 12'h356;
+    ld_cell_rght = 12'h356;
 	batt = 12'h900;
 	steerPot = 12'h100;
     $display("Get ready!");
 	riderOn_noGo;
     $display("Sending go command");
-	DUT_reset;
 	riderOn_go;
-	DUT_reset;
 	riderLeaning;
-    //chargeYourSegway;
+    chargeYourSegway;
     $display("Sending stop command");
-    DUT_reset;
 	ld_cell_lft = 12'h0;
     ld_cell_rght = 12'h0;
     segwayShutdown;
