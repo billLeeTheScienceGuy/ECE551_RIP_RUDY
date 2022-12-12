@@ -53,7 +53,6 @@ UART_tx iTX(.clk(clk),.rst_n(rst_n),.TX(RX_TX),.trmt(send_cmd),.tx_data(cmd),.tx
 ///////////////////////////////////
 rst_synch iRST(.clk(clk),.RST_n(RST_n),.rst_n(rst_n));
 
-
 initial begin
 	init;
     ld_cell_lft = 12'h356;
@@ -74,7 +73,7 @@ initial begin
     segwayShutdown;
 	
     $display("Wow! Unless it says otherwise, you have passed all tests! Great job");
-  $stop();
+	$stop();
 end
 
 always

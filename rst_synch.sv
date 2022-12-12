@@ -7,6 +7,7 @@ output logic rst_n;
 
 logic q1;
 
+//reset value if RST_n is low.
 always_ff @(posedge clk or negedge RST_n) begin
 	if(!RST_n) begin
 		q1 <= 1'b0;

@@ -19,6 +19,7 @@ localparam signed AZ_OFFSET = 16'h00A0;
 
 ////// Internal Signals //////
 logic signed [26:0] ptch_int;					//pitch integrating accumulator 
+logic signed [26:0] decremented_value;
 logic signed [15:0] ptch_rt_comp;
 logic signed [15:0] AZ_comp;
 logic signed [25:0] ptch_acc_product;
@@ -31,18 +32,21 @@ assign AZ_comp = $signed(AZ) - $signed(AZ_OFFSET);
 
 
 always_comb begin
-           ptch_acc_product = AZ_comp * $signed(377);		//327 is a fudge factor
-           ptch_acc = $signed({{3{ptch_acc_product[25]}},ptch_acc_product[25:13]});
-           FUSION_PTCH_OFFSET = $signed((ptch_acc > ptch) ? 1024 : $signed(-1024));
+	ptch_acc_product = AZ_comp * $signed(377);		//327 is a fudge factor
+	ptch_acc = {{3{ptch_acc_product[25]}},ptch_acc_product[25:13]};
+	FUSION_PTCH_OFFSET = (ptch_acc > ptch) ? 1024 : $signed(-1024);
 end
+
+always_ff @(posedge clk)
+	decremented_value = (ptch_int - {{11{ptch_rt_comp[15]}}, ptch_rt_comp} + FUSION_PTCH_OFFSET);
 
 always_ff @(posedge clk, negedge rst_n) begin
 	if(!rst_n)
 		ptch_int <= 0;
 	else if(vld)
-		ptch_int <= ptch_int - {{11{ptch_rt_comp[15]}}, ptch_rt_comp} + FUSION_PTCH_OFFSET;
+		ptch_int <= decremented_value;
 end
 
-assign ptch = $signed(ptch_int[26:11]);			//fully compensated and "fused" 16-bit signed pitch
+assign ptch = ptch_int[26:11];			//fully compensated and "fused" 16-bit signed pitch
 
 endmodule

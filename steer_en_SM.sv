@@ -91,10 +91,10 @@ module steer_en_SM(clk,rst_n,tmr_full,sum_gt_min,sum_lt_min,diff_gt_1_4,
       nxt_state = IDLE;
     endcase
   end
-  
+
+//FFs for improving timing
 always_ff @(posedge clk)
   rider_off <= rider_off_temp;
-
 always_ff @(posedge clk)
   en_steer <= en_steer_temp;
   

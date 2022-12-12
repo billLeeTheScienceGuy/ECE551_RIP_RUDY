@@ -13,7 +13,7 @@ set_dont_touch_network [find port clk]
 # Constrain Input Timings and Drive Strength #
 ##############################################
 set prim_inputs_1 [remove_from_collection [all_inputs] [find port clk]]
-set prim_inputs [remove_from_collection $prim_inputs_1 [find port rst_n]]
+set prim_inputs [remove_from_collection $prim_inputs_1 [find port RST_n]]
 set_input_delay -clock clk 0.25 [copy_collection $prim_inputs]
 set_driving_cell -lib_cell NAND2X2_LVT -library \
 saed32lvt_tt0p85v25c [copy_collection $prim_inputs]
@@ -62,6 +62,9 @@ set_multicycle_path 2 -hold -from [find pin iBAL/iCNTRL/ss_tmr_reg*/CLK]
 # 2nd Compile #
 ###############
 compile -map_effort medium
+compile -incremental_mapping -map_effort high
+
+ungroup -all -flatten
 
 ###########################
 # Report vg file and Area #

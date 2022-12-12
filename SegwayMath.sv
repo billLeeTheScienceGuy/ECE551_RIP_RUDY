@@ -11,6 +11,7 @@ output [11:0]lft_spd;
 output [11:0]rght_spd;
 output too_fast; 
 
+//Intermediate Signals
 logic [11:0]steer_pot_sat;
 logic signed [11:0]PID_ss;
 logic signed [19:0]PID_ss_temp;
@@ -21,10 +22,12 @@ logic signed [12:0]lft_torque_in;
 logic signed [12:0]rght_torque_in;
 logic signed [12:0]lft_torque;
 logic signed [12:0]rght_torque;
-logic signed [12:0]lft_torque_temp;
-logic signed [12:0]rght_torque_temp;
 logic unsigned [12:0]abs_lft_torque;
 logic unsigned [12:0]abs_rght_torque;
+
+//Intermediate Signals Used for Improving Timings
+logic signed [12:0]lft_torque_temp;
+logic signed [12:0]rght_torque_temp;
 
 /***
 Steering input,
@@ -49,6 +52,7 @@ assign rght_torque_in = {PID_ss[11], PID_ss} - {{1{steer_pot_final[11]}}, steer_
 assign lft_torque_temp = en_steer ? lft_torque_in : {PID_ss[11],PID_ss};
 assign rght_torque_temp = en_steer ? rght_torque_in: {PID_ss[11],PID_ss};
 
+//FF for improving timings
 always_ff @(posedge clk)
     lft_torque <= lft_torque_temp;
 always_ff @(posedge clk)
@@ -80,15 +84,10 @@ assign lft_shaped = pwr_up ? mux_to_mux  : 13'h0000 ;
 /***
 Everything below is the same as above, but instead shifted to be for the right side.
 */
-
 assign rght_torque_comp = rght_torque[12] ? (rght_torque - MIN_DUTY) : (rght_torque + MIN_DUTY) ;
-
 assign abs_rght_torque = rght_torque[12] ? (~rght_torque + 13'h001) : rght_torque[12:0];
-
 assign mux_to_mux2 = (abs_rght_torque > LOW_TORQUE_BAND) ?  rght_torque_comp : ($signed(GAIN_MULT) * rght_torque) ;
 assign rght_shaped = pwr_up ?  mux_to_mux2 :  13'h0000;
-
-
 
 // Saturates both lft_shaped and rght_shaped to be 12 bit signed.
 assign lft_spd = (lft_shaped[12] && !lft_shaped [11]) ? 12'h800 : (!lft_shaped[12] && lft_shaped[11]) ? 12'h7FF : lft_shaped[11:0] ;

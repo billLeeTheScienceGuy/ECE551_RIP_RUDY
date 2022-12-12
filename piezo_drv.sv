@@ -10,6 +10,7 @@ input logic en_steer;
 output logic piezo;
 output logic piezo_n;
 
+//Intermediate Signals
 logic reset_timer;
 logic [24:0]note_duration;
 logic [24:0]note_temp_duration;
@@ -22,12 +23,12 @@ logic [14:0]timer_frequency;
 logic piezo_temp;
 logic piezo_n_temp;
 
+//FAST_SIM
 parameter FAST_SIM = 1'b1;
 
 //States
 typedef enum reg [2:0] {IDLE, G6, C7, E7, G7, E7_2, G7_2} state_t;
 state_t state, nxt_state;
-
 
 /////////////////////////////////////////////////
 //////////            STATES           //////////
@@ -226,9 +227,11 @@ always_ff @(posedge clk, negedge rst_n)
     else 
         timer_seconds <= timer_seconds - 1'b1;
 
+//Temp values for Improving Timing
 assign piezo_temp = (timer_frequency >= {1'b0, note_temp_frequency[14:1]});
 assign piezo_n_temp = ~piezo_temp;
 
+//FF for Improving Timing
 always_ff @(posedge clk)
     piezo <= piezo_temp;
 always_ff @(posedge clk)

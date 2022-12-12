@@ -55,13 +55,13 @@ rst_synch iRST(.clk(clk),.RST_n(RST_n),.rst_n(rst_n));
 
 initial begin
 	init;
-    ld_cell_lft = 12'h156;
-    ld_cell_rght = 12'h156;
+    ld_cell_lft = 12'h356;
+    ld_cell_rght = 12'h356;
 	batt = 12'h900;
-	steerPot = 12'h100;
+	steerPot = 12'h200;
     $display("Get ready!");
 	riderOn_noGo;
-	  $stop();
+	$stop();
 end
 
 always

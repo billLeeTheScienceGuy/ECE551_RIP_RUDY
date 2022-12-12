@@ -10,10 +10,13 @@ input [15:0]ptch;
 input [15:0]ptch_rt;
 output signed [11:0]PID_cntrl;
 output signed [7:0]ss_tmr;
+
+//Params
 localparam signed P_COEFF = 5'h0C;
 parameter fast_sim = 1;
 localparam inc = fast_sim ? 256 : 1;
 
+//Intermediate Signals
 logic [26:0] timer;
 logic signed [15:0]PID_cntrl_temp;
 logic signed [14:0]P_term;
@@ -76,7 +79,6 @@ endgenerate
 assign D_term = {{3{~ptch_rt[15]}}, ~ptch_rt[15:6]};
 
 // Temp variable to use for saturation, currently is a 16-bit sum of P, I, D terms
-
 assign PID_cntrl_temp = {{{3{D_term[12]}},D_term[12:0]} + {P_term[14],P_term[14:0]} + {I_term[14],I_term[14:0]}}; 
 
 // Saturates PID_cntrl_temp to be a 12-bit value, set to the maximum positive value if too high to represent or set to the most negative value if too negative to represent.
