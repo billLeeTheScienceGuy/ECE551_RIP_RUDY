@@ -9,6 +9,7 @@ input logic too_fast;
 input logic en_steer;
 output logic piezo;
 output logic piezo_n;
+
 logic reset_timer;
 logic [24:0]note_duration;
 logic [24:0]note_temp_duration;
@@ -18,6 +19,8 @@ logic [27:0]timer_seconds;
 logic [14:0]note_frequency;
 logic [14:0]note_temp_frequency;
 logic [14:0]timer_frequency;
+logic piezo_temp;
+logic piezo_n_temp;
 
 parameter FAST_SIM = 1'b1;
 
@@ -223,6 +226,12 @@ always_ff @(posedge clk, negedge rst_n)
     else 
         timer_seconds <= timer_seconds - 1'b1;
 
-assign piezo = (timer_frequency >= {1'b0, note_temp_frequency[14:1]});
-assign piezo_n = ~piezo;
+assign piezo_temp = (timer_frequency >= {1'b0, note_temp_frequency[14:1]});
+assign piezo_n_temp = ~piezo_temp;
+
+always_ff @(posedge clk)
+    piezo <= piezo_temp;
+always_ff @(posedge clk)
+    piezo_n <= piezo_n_temp;
+
 endmodule

@@ -26,7 +26,7 @@ assign en_steer = round_count == 2'b10;
 assign en_batt = round_count == 2'b11;
 
 assign channel = en_l ? 3'b0 : en_r ? 3'b100 : en_steer ? 3'b101 : 3'b110;
-
+assign wt_data = {2'b00,channel[2:0],11'h000};
 
 always_ff@(posedge clk, negedge rst_n)
     if(!rst_n)
@@ -82,7 +82,5 @@ always_comb begin
     endcase
 
 end
-
-assign wt_data = {2'b00,channel[2:0],11'h000};
 
 endmodule

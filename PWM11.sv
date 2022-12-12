@@ -31,11 +31,11 @@ assign rst = (cnt >= duty);
 // reset has higher priority than set.
 always_ff@(posedge clk, negedge rst_n)begin
 	if(!rst_n)
-	PWM_sig_temp <= 11'h000;
+		PWM_sig_temp <= 11'h000;
 	else if (rst)
-	PWM_sig_temp <= 0;
+		PWM_sig_temp <= 0;
 	else if(set)
-	PWM_sig_temp <= 1;
+		PWM_sig_temp <= 1;
 	
 end
 

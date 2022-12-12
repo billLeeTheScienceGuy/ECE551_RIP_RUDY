@@ -30,6 +30,11 @@ logic done15;
 logic [3:0] bit_cntr;
 logic set_done;
 
+//Intermediate Signal to decrease timing
+logic [15:0] rd_data_temp;
+logic SCLK_temp;
+logic MOSI_temp;
+
 //States 
 typedef enum reg [1:0] {IDLE, SKIP, START, BACK} state_t;
 state_t state, nxt_state;
@@ -43,7 +48,10 @@ always_ff @(posedge clk)
 	else
 		SCLK_cnt <= SCLK_cnt + 4'h1;
 		
-assign SCLK = SCLK_cnt[3];
+assign SCLK_temp = SCLK_cnt[3];
+
+always_ff @(posedge clk)
+	SCLK <= SCLK_temp;
 
 //MOSI
 always_ff @(posedge clk) begin
@@ -60,7 +68,10 @@ always_ff @(posedge clk) begin
 	else if(shft)
 		shft_reg <= {shft_reg[14:0], MISO_smpl};
 end
-assign MOSI = shft_reg[15];
+assign MOSI_temp = shft_reg[15];
+
+always_ff @(posedge clk)
+	MOSI <= MOSI_temp;
 
 //done15
 always_ff @(posedge clk) begin
@@ -146,6 +157,9 @@ always_ff @(posedge clk, negedge rst_n) begin
 		SS_n <= 1'b1;	
 end
 
-assign rd_data = shft_reg;
+assign rd_data_temp = shft_reg;
+
+always_ff @(posedge clk)
+	rd_data <= rd_data_temp;
 
 endmodule

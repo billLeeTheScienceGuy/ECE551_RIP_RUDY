@@ -30,6 +30,7 @@ assign diff_gt_15_16 = ((sum - {4'b0, sum[12:4]}) < abs_diff);
 assign tmr_full = fast_sim ? &tmr[14:0] : &tmr[25:0];
 
 always@(posedge clk)
+
 if(clr_tmr) tmr <= 26'b0;
 else tmr <= tmr + 1'b1;
 

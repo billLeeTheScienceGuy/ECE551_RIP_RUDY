@@ -22,14 +22,14 @@ saed32lvt_tt0p85v25c [copy_collection $prim_inputs]
 # Constrain Output Timings and Load #
 #####################################
 set_output_delay -clock clk 0.35 [all_outputs]
-set_load 0.005 [all_outputs]
+set_load 50 [all_outputs]
 
 ##################################
 # Set Wireload & Transition Time #
 ##################################
-set_max_transition 0.1 [current_design]
 set_wire_load_model -name 16000 \
 -library saed32lvt_tt0p85v25c
+set_max_transition 0.1 [current_design]
 
 ###############
 # 1st Compile #
