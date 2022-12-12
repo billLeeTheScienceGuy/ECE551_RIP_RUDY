@@ -32,7 +32,6 @@ assign adder = ptch_err_sat_ext[17:0] + integrator[17:0];
 // Checks MSB of both operands and sees if they match, otherwise, it overflowed.
 assign ov = (integrator[17] === ptch_err_sat_ext[17] && adder[17] !== integrator[17]) ? 1'b1: 1'b0;
 
-
 // If there is no overflow, we add ptch_err_sat to integrator, otherwise we maintain 
 // the previous value of integrator. If the rider is not on, we set integrator to 0.
 always_ff@(posedge clk, negedge rst_n)begin
@@ -57,9 +56,6 @@ end
 
 // Sets the upper bits of timer to ss_tmr.
 assign ss_tmr = timer[26:19];
-
-	
-
 
 // ptch_err_sat is the 10-bit saturated version of the 16-bit ptch, 
 // set to the maximum positive value if too high to represent or set to the most negative value if too negative to represent.

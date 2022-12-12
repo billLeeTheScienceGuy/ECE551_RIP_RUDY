@@ -7,6 +7,10 @@ input [10:0]duty;
 logic rst, set;
 logic[10:0]cnt;
 
+logic PWM_sig_temp;
+logic PWM_synch_temp;
+logic OVR_I_blank_n_temp
+
 output logic PWM_sig;
 output logic PWM_synch;
 output logic OVR_I_blank_n;
@@ -27,17 +31,27 @@ assign rst = (cnt >= duty);
 // reset has higher priority than set.
 always_ff@(posedge clk, negedge rst_n)begin
 	if(!rst_n)
-	PWM_sig <= 11'h000;
+	PWM_sig_tmep <= 11'h000;
 	else if (rst)
-	PWM_sig <= 0;
+	PWM_sig_temp <= 0;
 	else if(set)
-	PWM_sig <= 1;
+	PWM_sig_temp <= 1;
 	
 end
 
 	
-assign PWM_synch = &cnt;
+assign PWM_synch_tmep = &cnt;
 
-assign OVR_I_blank_n = cnt > 255;
+assign OVR_I_blank_n_temp = cnt > 255;
+
+always_ff@(posedge clk)
+	PWM_sig <= PWM_sig_temp;
+
+always_ff@(posedge clk)
+	PWM_synch <= PWM_synch_temp;
+
+always_ff@(posedge clk)
+	OVR_I_blank_n <= OVR_I_blank_n_temp;
 	
+
 endmodule
