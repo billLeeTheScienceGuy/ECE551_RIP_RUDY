@@ -67,15 +67,23 @@ task chargeYourSegway;
 endtask 
 
 task slowDown;
-    $display("Running test slow down");
-    rider_lean = $signed(16'h1FFF);
-    steerPot = 12'hE01;
-    repeat(30000)@(posedge clk);
-    assert (iDUT.iBAL.iDUTDUT.steer_pot_sat === 12'hE00);
+    $display("Running test slowDown");
+    rider_lean = $signed(16'h0);
+    repeat(300000) @(posedge clk) begin
+    #5;
+    rider_lean += 8'h50;
+    end
+    @(posedge iDUT.too_fast);
     assert (iDUT.too_fast === 1);
     $display("Yahoo! slowDown Test Passed !!!");
 endtask
 
+task areYaSteering;
+    $display("Running test areYaSteering");
+    @(posedge iDUT.en_steer);
+    assert (iDUT.en_steer === 1);
+    $display("Yahoo! areYaSteering Test Passed !!!");
+endtask
 
 task automatic send_command(input [7:0]command, ref clk, send_cmd , cmd_sent, ref [7:0] cmd);
     @(negedge clk);

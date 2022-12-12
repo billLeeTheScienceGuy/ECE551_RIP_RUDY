@@ -65,12 +65,14 @@ initial begin
     $display("Sending go command");
 	riderOn_go;
 	riderLeaning;
+	areYaSteering;
 	slowDown;
     chargeYourSegway;
     $display("Sending stop command");
 	ld_cell_lft = 12'h0;
     ld_cell_rght = 12'h0;
     segwayShutdown;
+	
     $display("Wow! Unless it says otherwise, you have passed all tests! Great job");
   $stop();
 end

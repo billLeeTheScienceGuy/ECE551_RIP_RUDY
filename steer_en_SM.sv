@@ -63,7 +63,8 @@ module steer_en_SM(clk,rst_n,tmr_full,sum_gt_min,sum_lt_min,diff_gt_1_4,
       else begin 
         rider_off = 0;
       end 
-      STEERING: if(sum_lt_min) begin
+      STEERING: 
+      if(sum_lt_min) begin
         rider_off = 1;
         nxt_state = IDLE;
       end
@@ -72,9 +73,10 @@ module steer_en_SM(clk,rst_n,tmr_full,sum_gt_min,sum_lt_min,diff_gt_1_4,
         rider_off = 0;
         nxt_state = WAITING;
       end
-      else begin en_steer = 1; 
+      else begin
+      en_steer = 1; 
       rider_off = 0;
-    end 
+      end
       // Default state is IDLE or "INITIAL"
       IDLE: 
       if(sum_gt_min) begin
