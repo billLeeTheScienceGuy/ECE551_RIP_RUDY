@@ -1,21 +1,20 @@
-`timescale 1ns/1ps
+
 module SegwayMath(clk, PID_cntrl,ss_tmr,steer_pot,en_steer,pwr_up,lft_spd,rght_spd,too_fast);
 
 input logic clk;
 input signed [11:0]PID_cntrl;
-input [7:0]ss_tmr;
-input [11:0]steer_pot;
+input logic [7:0]ss_tmr;
+input logic [11:0]steer_pot;
 input wire en_steer;
 input wire pwr_up;
-output [11:0]lft_spd;
-output [11:0]rght_spd;
+output logic [11:0]lft_spd;
+output logic [11:0]rght_spd;
 output too_fast; 
 
 //Intermediate Signals
 logic [11:0]steer_pot_sat;
 logic signed [11:0]PID_ss;
 logic signed [19:0]PID_ss_temp;
-logic [11:0]steer_pot;
 logic signed [11:0]steer_pot_signed;
 logic signed [11:0]steer_pot_final;
 logic signed [12:0]lft_torque_in;
@@ -49,14 +48,8 @@ assign lft_torque_in = {{1{steer_pot_final[11]}},steer_pot_final} + {PID_ss[11],
 assign rght_torque_in = {PID_ss[11], PID_ss} - {{1{steer_pot_final[11]}}, steer_pot_final};
 
 // Assigns lft_torque/right torque if steering is enabled.
-assign lft_torque_temp = en_steer ? lft_torque_in : {PID_ss[11],PID_ss};
-assign rght_torque_temp = en_steer ? rght_torque_in: {PID_ss[11],PID_ss};
-
-//FF for improving timings
-always_ff @(posedge clk)
-    lft_torque <= lft_torque_temp;
-always_ff @(posedge clk)
-    rght_torque <= rght_torque_temp;
+assign lft_torque = en_steer ? lft_torque_in : {PID_ss[11],PID_ss};
+assign rght_torque = en_steer ? rght_torque_in: {PID_ss[11],PID_ss};
 
 /***
 Deadzone Shaping
@@ -70,7 +63,7 @@ logic signed [12:0]mux_to_mux;
 logic signed [12:0]mux_to_mux2;
 logic signed [12:0]lft_torque_comp;
 logic signed [12:0]rght_torque_comp;
-
+logic too_fast_lft, too_fast_rght;
 
 // Assigns either negated MIN_DUTY + lft_torque or MIN_DUTY +lft_torque to lft_torque_comp
 assign lft_torque_comp = lft_torque[12] ? (lft_torque - MIN_DUTY) : (lft_torque + MIN_DUTY);

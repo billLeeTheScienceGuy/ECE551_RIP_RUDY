@@ -1,4 +1,4 @@
-`timescale 1ns/1ps
+
 module mtr_drv(clk,rst_n,lft_spd,rght_spd,OVR_I_lft,OVR_I_rght,PWM1_lft,
                PWM2_lft,PWM1_rght,PWM2_rght);
 			   

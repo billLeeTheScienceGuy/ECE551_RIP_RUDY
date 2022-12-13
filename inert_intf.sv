@@ -1,8 +1,8 @@
-`timescale 1ns/1ps
+
 module inert_intf(clk,rst_n,ptch,ptch_rt,vld,SS_n,SCLK,
                   MOSI,MISO,INT);
  
-  parameter fast_sim = 1;
+  parameter fast_sim = 0;
  
   input clk, rst_n;
   input MISO;					// SPI input from inertial sensor

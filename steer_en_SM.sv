@@ -1,4 +1,4 @@
-`timescale 1ns/1ps
+
 module steer_en_SM(clk,rst_n,tmr_full,sum_gt_min,sum_lt_min,diff_gt_1_4,
                    diff_gt_15_16,clr_tmr,en_steer,rider_off);
 
@@ -28,10 +28,7 @@ module steer_en_SM(clk,rst_n,tmr_full,sum_gt_min,sum_lt_min,diff_gt_1_4,
   output logic clr_tmr;		// clears the 1.3sec timer
   output logic en_steer;	// enables steering (goes to balance_cntrl)
   output logic rider_off;	// held high in initial state when waiting for sum_gt_min
-  
-  logic rider_off_temp;
-  logic en_steer_temp;
-
+ 
   // You fill out the rest...use good SM coding practices ///
   typedef enum logic [1:0]{IDLE, WAITING, STEERING} state_t;
   state_t state, nxt_state;
@@ -45,45 +42,45 @@ module steer_en_SM(clk,rst_n,tmr_full,sum_gt_min,sum_lt_min,diff_gt_1_4,
 
   always_comb begin
     clr_tmr = 0;
-    en_steer_temp = 0;
-    rider_off_temp = 1;
+    en_steer = 0;
+    rider_off  = 1;
     nxt_state = state;
 
     case(state)
       WAITING: if(sum_lt_min) begin
-        rider_off_temp = 1;
+        rider_off  = 1;
         nxt_state = IDLE;
       end
       else if (diff_gt_1_4) begin
         clr_tmr= 1;
-        rider_off_temp = 0;
+        rider_off  = 0;
       end
       else if (tmr_full) begin
         nxt_state = STEERING;
-        rider_off_temp = 0;
-        en_steer_temp = 1;
+        rider_off = 0;
+        en_steer = 1;
       end
       else begin 
-        rider_off_temp = 0;
+        rider_off  = 0;
       end 
       STEERING: 
       if(sum_lt_min) begin
-        rider_off_temp = 1;
+        rider_off  = 1;
         nxt_state = IDLE;
       end
       else if(diff_gt_15_16) begin
         clr_tmr = 1;
-        rider_off_temp = 0;
+        rider_off  = 0;
         nxt_state = WAITING;
       end
       else begin 
-        en_steer_temp = 1; 
-        rider_off_temp = 0;
+        en_steer  = 1; 
+        rider_off  = 0;
       end 
       // Default state is IDLE or "INITIAL"
       IDLE: 
       if(sum_gt_min) begin
-        rider_off_temp = 0;
+        rider_off  = 0;
         clr_tmr = 1;
         nxt_state = WAITING;
       end
@@ -91,11 +88,5 @@ module steer_en_SM(clk,rst_n,tmr_full,sum_gt_min,sum_lt_min,diff_gt_1_4,
       nxt_state = IDLE;
     endcase
   end
-
-//FFs for improving timing
-always_ff @(posedge clk)
-  rider_off <= rider_off_temp;
-always_ff @(posedge clk)
-  en_steer <= en_steer_temp;
   
 endmodule

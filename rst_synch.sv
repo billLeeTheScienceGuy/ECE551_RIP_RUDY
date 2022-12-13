@@ -1,4 +1,4 @@
-`timescale 1ns/1ps
+
 module rst_synch(RST_n, clk, rst_n);
 
 input RST_n;

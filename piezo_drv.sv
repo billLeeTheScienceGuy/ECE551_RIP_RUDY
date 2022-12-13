@@ -1,4 +1,4 @@
-`timescale 1ns/1ps
+
 module piezo_drv(batt_low, too_fast, en_steer, clk, rst_n, piezo, piezo_n);
 
 //inputs and outputs
@@ -24,7 +24,7 @@ logic piezo_temp;
 logic piezo_n_temp;
 
 //FAST_SIM
-parameter FAST_SIM = 1'b1;
+parameter fast_sim = 0;
 
 //States
 typedef enum reg [2:0] {IDLE, G6, C7, E7, G7, E7_2, G7_2} state_t;
@@ -192,7 +192,7 @@ end
 /////////////////////////////////////////////////
 
 generate 
-    if(FAST_SIM) begin
+    if(fast_sim) begin
         assign note_temp_duration = note_duration / 512;
         assign note_temp_frequency = note_frequency / 512;
         assign seconds = 28'd5000;
@@ -228,13 +228,7 @@ always_ff @(posedge clk, negedge rst_n)
         timer_seconds <= timer_seconds - 1'b1;
 
 //Temp values for Improving Timing
-assign piezo_temp = (timer_frequency >= {1'b0, note_temp_frequency[14:1]});
-assign piezo_n_temp = ~piezo_temp;
-
-//FF for Improving Timing
-always_ff @(posedge clk)
-    piezo <= piezo_temp;
-always_ff @(posedge clk)
-    piezo_n <= piezo_n_temp;
+assign piezo = (timer_frequency >= {1'b0, note_temp_frequency[14:1]});
+assign piezo_n_temp = ~piezo;
 
 endmodule

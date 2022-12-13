@@ -1,5 +1,4 @@
 //Team name: RIP Rudy
-`timescale 1ns/1ps
 module inertial_integrator (clk, rst_n, vld, ptch_rt, AZ, ptch);
 
 ////// Inputs //////
@@ -19,7 +18,6 @@ localparam signed AZ_OFFSET = 16'h00A0;
 
 ////// Internal Signals //////
 logic signed [26:0] ptch_int;					//pitch integrating accumulator 
-logic signed [26:0] decremented_value;
 logic signed [15:0] ptch_rt_comp;
 logic signed [15:0] AZ_comp;
 logic signed [25:0] ptch_acc_product;
@@ -37,14 +35,11 @@ always_comb begin
 	FUSION_PTCH_OFFSET = (ptch_acc > ptch) ? 1024 : $signed(-1024);
 end
 
-always_ff @(posedge clk)
-	decremented_value = (ptch_int - {{11{ptch_rt_comp[15]}}, ptch_rt_comp} + FUSION_PTCH_OFFSET);
-
 always_ff @(posedge clk, negedge rst_n) begin
 	if(!rst_n)
 		ptch_int <= 0;
 	else if(vld)
-		ptch_int <= decremented_value;
+		ptch_int <= (ptch_int - {{11{ptch_rt_comp[15]}}, ptch_rt_comp} + FUSION_PTCH_OFFSET);
 end
 
 assign ptch = ptch_int[26:11];			//fully compensated and "fused" 16-bit signed pitch

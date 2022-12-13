@@ -1,4 +1,4 @@
-`timescale 1ns/1ps
+
 module ADC128S_FC(clk,rst_n,SS_n,SCLK,MISO,MOSI,ld_cell_lft,ld_cell_rght,steerPot,batt);
   //////////////////////////////////////////////////|
   // Model of a National Semi Conductor ADC128S    ||

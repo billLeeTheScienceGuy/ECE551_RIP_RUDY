@@ -1,4 +1,4 @@
-`timescale 1ns/1ps
+
 module steer_en(lft_ld, rght_ld, clk, rst_n, en_steer, rider_off);
 
 input logic [11:0]lft_ld, rght_ld;
@@ -10,7 +10,7 @@ localparam WT_HYSTERESIS = 12'h040;
 steer_en_SM iSTATE(.*);
 
 
-parameter fast_sim = 1;
+parameter fast_sim = 0;
 logic [12:0] sum;
 logic signed [11:0] diff;
 logic [11:0] abs_diff;
