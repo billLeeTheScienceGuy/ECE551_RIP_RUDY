@@ -1,4 +1,4 @@
-`timescale 1ns/1ps
+
 module Auth_blk(clk, rst_n, RX, rider_off, pwr_up);
 
 //inputs for Auth_blk

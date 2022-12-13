@@ -1,4 +1,4 @@
-`timescale 1ns/1ps
+
 module PID(pwr_up, rider_off, clk, rst_n, vld,ptch, ptch_rt, PID_cntrl, ss_tmr);
 
 input pwr_up;

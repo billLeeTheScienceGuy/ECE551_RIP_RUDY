@@ -1,4 +1,4 @@
-`timescale 1ns/1ps
+
 module Segway(clk,RST_n,INERT_SS_n,INERT_MOSI,INERT_SCLK,
               INERT_MISO,INERT_INT,A2D_SS_n,A2D_MOSI,A2D_SCLK,
 			  A2D_MISO,PWM1_lft,PWM2_lft,PWM1_rght,PWM2_rght,

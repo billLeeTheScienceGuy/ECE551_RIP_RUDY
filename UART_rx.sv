@@ -1,4 +1,4 @@
-`timescale 1ns/1ps
+
 module UART_rx(clk,rst_n,RX,clr_rdy,rx_data,rdy);
 
 input clk, rst_n, RX, clr_rdy;		
@@ -98,10 +98,6 @@ always_comb begin
 		end
 	endcase
 end
-
-
-
-
 
 assign shift = (baud_cnt == CLKS_PER_BIT);
 assign rx_data = rx_shft_reg[7:0];
