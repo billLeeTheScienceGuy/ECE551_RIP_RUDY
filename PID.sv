@@ -12,7 +12,7 @@ output signed [11:0]PID_cntrl;
 output signed [7:0]ss_tmr;
 
 //Params
-localparam signed P_COEFF = 5'h0D;
+localparam signed P_COEFF = 5'h0C;
 parameter fast_sim = 0;
 localparam inc = fast_sim ? 256 : 1;
 
